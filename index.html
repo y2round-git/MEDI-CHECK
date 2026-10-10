@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEDI-CHECK Browser | 인스타그램 의료정보 신뢰도 검증 브라우저</title>
+  <meta name="description" content="SNS 인스타그램에 등록된 건강 및 의료 정보의 과학적 근거를 5단계 파이프라인으로 검증하고 4단계 MEDI-CHECK 인증 라벨을 부여하는 스마트 의료 브라우저">
+  
+  <!-- Google Fonts: Inter & Pretendard fallback -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons for UI -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 전체 브라우저 윈도우 래퍼 -->
+  <div class="browser-window" id="browserWindow">
+    
+    <!-- 1. 브라우저 최상단 창 탭 바 -->
+    <header class="browser-window-header">
+      <div class="window-controls">
+        <span class="control-dot close" title="닫기"></span>
+        <span class="control-dot minimize" title="최소화"></span>
+        <span class="control-dot maximize" title="최대화"></span>
+      </div>
+      
+      <div class="browser-tabs-wrapper">
+        <div class="browser-tab active" id="mainTab">
+          <i class="fa-solid fa-shield-halved tab-icon"></i>
+          <span class="tab-title" id="tabTitle">MEDI-CHECK Guard - @miracle_detox_life</span>
+          <button class="tab-close-btn" aria-label="탭 닫기"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="browser-tab new-tab-btn" id="newTabBtn" title="새 탭 열기">
+          <i class="fa-solid fa-plus"></i>
+        </div>
+      </div>
+      
+      <div class="window-quick-status">
+        <span class="engine-badge online"><i class="fa-solid fa-circle"></i> AI Medical FactCheck Engine v2.4</span>
+      </div>
+    </header>
+
+    <!-- 2. 브라우저 내비게이션 및 스마트 주소창 (Omnibar) -->
+    <nav class="browser-nav-bar" aria-label="브라우저 내비게이션">
+      
+      <!-- 스마트 주소창 (단일 입력창 통일) -->
+      <div class="omnibar-container">
+        <div class="ssl-indicator" title="보안 연결됨">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <div class="service-logo" title="Instagram 의료검증 전용">
+          <i class="fa-brands fa-instagram"></i>
+        </div>
+        <input 
+          type="url" 
+          id="urlInput" 
+          class="url-input" 
+          placeholder="인스타그램 URL을 입력하세요"
+          value=""
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <button class="url-clear-btn" id="urlClearBtn" title="입력 지우기" aria-label="입력 지우기"><i class="fa-solid fa-circle-xmark"></i></button>
+
+        <!-- 버튼 1: 실제 URL접속 검증 -->
+        <button class="btn-inspect" id="btnInspect">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          <span>실제 URL접속 검증</span>
+        </button>
+      </div>
+
+      <!-- 우측 상단 유틸리티 메뉴 -->
+      <div class="nav-utilities">
+        <!-- 버튼 2: 설정 버튼만 남김 -->
+        <button class="util-btn highlight" id="btnOpenSettings" title="평가 기준 및 파이프라인 설정">
+          <i class="fa-solid fa-gear"></i>
+          <span>설정</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- 3. 메인 콘텐츠 워크스페이스 (Split View 2열 레이아웃) -->
+    <main class="browser-workspace">
+      
+      <!-- ==============================================
+           [LEFT/CENTER ZONE] MEDI-CHECK 인텔리전스 콘솔
+           ============================================== -->
+      <section class="analysis-console-panel" aria-label="의료정보 분석 대시보드">
+        
+        <!-- 상단 헤더: 분석 대상 요약 & 신뢰도 점수 게이지 -->
+        <article class="analysis-hero-card" id="analysisHeroCard">
+          <div class="hero-header-row">
+            <div class="topic-meta">
+              <span class="badge-category" id="heroCategory">종양학 / 종양치료 보완대체의학</span>
+              <h1 class="hero-post-title" id="heroPostTitle">레몬물 디톡스로 온몸의 독소 배출과 암세포 99% 박멸?!</h1>
+              <p class="hero-url-sub" id="heroUrlSub">인스타그램 출처: https://www.instagram.com/p/C9_lemon_detox_cancer_myth/</p>
+            </div>
+            
+            <div class="score-radial-wrapper" id="scoreRadialWrapper">
+              <div class="score-circle-outer">
+                <svg class="score-svg" viewBox="0 0 100 100">
+                  <circle class="score-bg-circle" cx="50" cy="50" r="42"></circle>
+                  <circle class="score-progress-circle" id="scoreProgressCircle" cx="50" cy="50" r="42"></circle>
+                </svg>
+                <div class="score-inner-text">
+                  <span class="score-number" id="scoreNumber">12</span>
+                  <span class="score-unit">/ 100점</span>
+                </div>
+              </div>
+              <span class="score-caption">종합 신뢰도 지수</span>
+            </div>
+          </div>
+
+          <!-- 4단계 MEDI-CHECK 최종 인증 라벨 배너 -->
+          <div class="medicheck-label-banner" id="medicheckLabelBanner">
+            <div class="banner-badge-icon" id="bannerBadgeIcon">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+            <div class="banner-info">
+              <div class="banner-title-line">
+                <span class="label-status-name" id="labelStatusName">잘못된 정보 확인</span>
+                <span class="label-tier-tag" id="labelTierTag">3단계 분류 (High Risk)</span>
+              </div>
+              <p class="banner-description" id="bannerDescription">
+                신뢰할 만한 의학적 근거와 명확하게 배치되는 주장이 확인된 정보입니다. 
+                정규 치료를 방해하여 신체적 위해를 가할 위험이 높습니다.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <!-- ★★★ [사용자 핵심 요구] 전면 등급 판정 사유 (Verdict Breakdown Card) ★★★ -->
+        <article class="verdict-breakdown-card" id="verdictBreakdownCard">
+          <div class="verdict-card-header">
+            <div class="verdict-header-title">
+              <i class="fa-solid fa-scale-balanced verdict-icon"></i>
+              <div>
+                <h2 class="verdict-title">이 등급을 받은 핵심 이유 (Why This Grade?)</h2>
+                <span class="verdict-subtitle">의학적 근거 대조 및 전문가 패널의 직접적인 판정 사유입니다.</span>
+              </div>
+            </div>
+            <span class="verdict-risk-badge" id="verdictRiskBadge">매우 높음 (Critical Risk)</span>
+          </div>
+
+          <!-- 1. 검증 대상 주장 -->
+          <div class="verdict-target-claim-box">
+            <div class="claim-label"><i class="fa-solid fa-triangle-exclamation"></i> 문제의 주장 (Detected Claim)</div>
+            <p class="claim-text" id="verdictTargetClaim">
+              "공복에 레몬물을 마시면 체내 pH가 알칼리로 바뀌어 암세포가 99% 굶어 죽으므로 항암치료를 대체할 수 있다."
+            </p>
+          </div>
+
+          <!-- 2. 왜 이 등급인가? 3대 의학적 판단 근거 -->
+          <div class="verdict-reasons-container">
+            <h3 class="reasons-heading"><i class="fa-solid fa-stethoscope"></i> 의학적 판정 근거 (Medical Assessment)</h3>
+            <div class="reasons-list" id="verdictReasonsList">
+              <!-- 동적 렌더링 -->
+            </div>
+          </div>
+
+          <!-- 3. 전문의 1줄 총평 -->
+          <div class="verdict-doctor-summary-box">
+            <div class="doc-quote-icon"><i class="fa-solid fa-user-doctor"></i></div>
+            <div class="doc-quote-body">
+              <div class="doc-quote-label">공인 전문의 판정 소견</div>
+              <p class="doc-quote-text" id="verdictDoctorSummary">
+                "과학적 근거가 전혀 없는 전형적인 사이비 항암 치료설입니다. 암세포 사멸 기전이 전혀 존재하지 않으며, 항암치료 거부를 유도하여 환자를 사망에 이르게 할 수 있는 매우 위험한 허위정보입니다."
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <!-- [첨부 1, 2 반영] 5단계 검증 파이프라인 진행 상태 카드 -->
+        <section class="pipeline-section">
+          <div class="section-heading-row">
+            <h2 class="section-title">
+              <i class="fa-solid fa-list-check"></i>
+              <span>MEDI-CHECK 5단계 검증 프로세스</span>
+            </h2>
+            <span class="pipeline-status-text" id="pipelineStatusText">실시간 5단계 검증 완료</span>
+          </div>
+
+          <div class="pipeline-stack" id="pipelineStack">
+            
+            <div class="pipeline-step-card step-done" id="pipeStep1">
+              <div class="step-card-header">
+                <span class="step-badge">1단계</span>
+                <h3 class="step-title">게시물 등록 및 탐지</h3>
+                <span class="step-indicator-state"><i class="fa-solid fa-circle-check"></i> 완료</span>
+              </div>
+              <p class="step-desc">건강·의료 관련 SNS 게시물 분류 및 메타데이터 파싱</p>
+            </div>
+
+            <div class="pipeline-arrow"><i class="fa-solid fa-arrow-down"></i></div>
+
+            <div class="pipeline-step-card step-done" id="pipeStep2">
+              <div class="step-card-header">
+                <span class="step-badge">2단계</span>
+                <h3 class="step-title">AI 사전 분석</h3>
+                <span class="step-indicator-state"><i class="fa-solid fa-circle-check"></i> 완료</span>
+              </div>
+              <p class="step-desc">주요 주장 추출 및 의학적 근거(PubMed/질병청) 대조</p>
+            </div>
+
+            <div class="pipeline-arrow"><i class="fa-solid fa-arrow-down"></i></div>
+
+            <div class="pipeline-step-card step-done" id="pipeStep3">
+              <div class="step-card-header">
+                <span class="step-badge">3단계</span>
+                <h3 class="step-title">전문가 검증</h3>
+                <span class="step-indicator-state"><i class="fa-solid fa-circle-check"></i> 완료</span>
+              </div>
+              <p class="step-desc">의료 전문가가 근거와 판단 결과 검토 및 위험도 평가</p>
+            </div>
+
+            <div class="pipeline-arrow"><i class="fa-solid fa-arrow-down"></i></div>
+
+            <div class="pipeline-step-card step-highlight step-done" id="pipeStep4">
+              <div class="step-card-header">
+                <span class="step-badge">4단계</span>
+                <h3 class="step-title">MEDI-CHECK 라벨 부착</h3>
+                <span class="step-indicator-state"><i class="fa-solid fa-shield"></i> 라벨 적용됨</span>
+              </div>
+              <p class="step-desc">검증 결과와 근거 자료를 SNS에 표시 (4단계 등급 부여)</p>
+            </div>
+
+            <div class="pipeline-arrow"><i class="fa-solid fa-arrow-down"></i></div>
+
+            <div class="pipeline-step-card step-done" id="pipeStep5">
+              <div class="step-card-header">
+                <span class="step-badge">5단계</span>
+                <h3 class="step-title">재검증 및 갱신</h3>
+                <span class="step-indicator-state"><i class="fa-solid fa-clock-rotate-left"></i> 실시간 반영</span>
+              </div>
+              <p class="step-desc">새로운 연구 결과나 의료 지침 변경 및 사용자 제보 반영</p>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- 의학적 팩트체크 상세 분석 리포트 -->
+        <section class="report-details-section">
+          <div class="tabs-nav-bar">
+            <button class="tab-btn active" data-tab="claims">
+              <i class="fa-solid fa-microscope"></i> 핵심 주장 & 학술 근거
+            </button>
+            <button class="tab-btn" data-tab="doctor">
+              <i class="fa-solid fa-user-doctor"></i> 전문의 심의 소견
+            </button>
+            <button class="tab-btn" data-tab="action">
+              <i class="fa-solid fa-shield-heart"></i> 권장 조치 가이드
+            </button>
+          </div>
+
+          <div class="tab-content-panel active" id="tabClaims">
+            <div class="claims-box">
+              <h4 class="subhead"><i class="fa-solid fa-quote-left"></i> 게시물에서 추출된 주요 주장</h4>
+              <ul class="claims-list" id="extractedClaimsList"></ul>
+            </div>
+            <div class="evidence-box">
+              <h4 class="subhead"><i class="fa-solid fa-file-medical"></i> 공인 의학 데이터베이스 대조 근거</h4>
+              <div class="evidence-list" id="medicalEvidenceList"></div>
+            </div>
+          </div>
+
+          <div class="tab-content-panel" id="tabDoctor">
+            <div class="doctor-review-card">
+              <div class="doctor-header">
+                <div class="doctor-avatar-circle">
+                  <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <div>
+                  <h4 class="doctor-name" id="doctorExpertName">박준혁 교수 (종양내과 전문의)</h4>
+                  <span class="doctor-date" id="doctorReviewDate">2026.10.08 검증</span>
+                </div>
+              </div>
+              <p class="doctor-comment-text" id="doctorCommentText"></p>
+            </div>
+          </div>
+
+          <div class="tab-content-panel" id="tabAction">
+            <div class="action-guide-card">
+              <div class="action-guide-icon">
+                <i class="fa-solid fa-bell"></i>
+              </div>
+              <div>
+                <h4 class="action-guide-title">사용자를 위한 의학적 행동 수칙</h4>
+                <p class="action-guide-desc" id="actionGuideDesc"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 댓글 기능 -->
+        <section class="comments-section" id="commentsSection">
+          <div class="comments-header">
+            <h3 class="comments-title">
+              <i class="fa-solid fa-comments"></i>
+              <span>의료정보 팩트체크 토론장</span>
+              <span class="comments-count" id="commentsCount">(3)</span>
+            </h3>
+            <div class="comment-filters">
+              <button class="filter-chip active" data-filter="all">전체</button>
+              <button class="filter-chip" data-filter="expert">의료전문가 인증</button>
+            </div>
+          </div>
+
+          <form class="comment-compose-card" id="commentForm">
+            <div class="compose-author-row">
+              <input type="text" id="commentAuthor" class="compose-input name" placeholder="작성자 닉네임" required maxlength="15">
+              <select id="commentRole" class="compose-select" title="전문가 자격 선택">
+                <option value="user">일반 사용자</option>
+                <option value="doctor">의사 (전문의 인증)</option>
+                <option value="pharmacist">약사 인증</option>
+                <option value="dietitian">임상영양사 인증</option>
+                <option value="factchecker">의료 팩트체커</option>
+              </select>
+            </div>
+            <textarea id="commentText" class="compose-textarea" placeholder="해당 의료정보에 대한 의견, 임상 경험 또는 추가 근거를 자유롭게 공유해 주세요..." required rows="3"></textarea>
+            <div class="compose-bottom-row">
+              <span class="compose-tip"><i class="fa-solid fa-circle-info"></i> 허위사실 유포 방지를 위해 건전한 근거 중심 토론을 지향합니다.</span>
+              <button type="submit" class="btn-submit-comment">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>댓글 등록</span>
+              </button>
+            </div>
+          </form>
+
+          <div class="comments-list" id="commentsList"></div>
+        </section>
+
+      </section>
+
+
+      <!-- ==============================================
+           [RIGHT ZONE] 대형 스마트폰(아이폰 16 Pro) 화면
+           실제로 접속한 인스타그램 라이브 화면 및 플로팅 배지
+           ============================================== -->
+      <section class="smartphone-view-panel" aria-label="스마트폰 인스타그램 화면">
+        
+        <div class="phone-stage-title">
+          <div class="stage-badge"><i class="fa-brands fa-apple"></i> iPhone 16 Pro Display</div>
+          <!-- 뷰 모드 토글 버튼 전체 삭제됨 -->
+        </div>
+
+        <div class="iphone-device-frame" id="iphoneDevice">
+          
+          <div class="phone-button volume-up"></div>
+          <div class="phone-button volume-down"></div>
+          <div class="phone-button action-btn"></div>
+          <div class="phone-button power-btn"></div>
+
+          <div class="iphone-screen">
+            <div class="dynamic-island">
+              <div class="island-camera"></div>
+              <div class="island-pill-content">
+                <i class="fa-solid fa-shield-virus"></i>
+                <span>MEDI-CHECK LIVE</span>
+              </div>
+            </div>
+
+            <div class="ios-status-bar">
+              <span class="ios-time" id="iosTime">09:41</span>
+              <div class="ios-icons">
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-battery-full"></i>
+              </div>
+            </div>
+
+            <!-- iOS 사파리 / 인앱 브라우저 상단 주소 바 전체 삭제됨 -->
+
+            <!-- 바로 뷰 화면 시작 -->
+            <div class="instagram-app-container" id="instaMobileAppView" style="display:none;">
+              
+              <!-- 인스타그램 상단 네비게이션 헤더 (실제 모바일 웹 스타일) -->
+              <header class="insta-app-header">
+                <div class="insta-header-left">
+                  <i class="fa-solid fa-arrow-left insta-back-icon" id="btnInstaHeaderBack" title="뒤로가기"></i>
+                  <span class="insta-logo-wordmark">Instagram</span>
+                </div>
+                <div class="insta-header-actions">
+                  <button class="insta-open-app-btn" id="btnInstaOpenApp"><i class="fa-brands fa-instagram"></i> 앱에서 열기</button>
+                  <button class="insta-quick-edit-icon-btn" id="btnQuickEditPost" title="게시물 사진/내용 직접 편집"><i class="fa-solid fa-pen"></i></button>
+                </div>
+              </header>
+
+              <!-- 인스타그램 단일 피드 게시물 카드 -->
+              <article class="insta-post-card">
+                
+                <!-- 작성자 프로필 정보 바 -->
+                <div class="insta-post-header">
+                  <div class="insta-author-info">
+                    <img src="" alt="작성자 아바타" class="insta-author-avatar" id="instaAuthorAvatar">
+                    <div class="insta-name-box">
+                      <div class="name-line">
+                        <span class="insta-username" id="instaAuthorUsername">miracle_detox_life</span>
+                        <i class="fa-solid fa-circle-check verified-badge" id="instaVerifiedBadge"></i>
+                        <span class="bullet-dot">•</span>
+                        <button class="insta-follow-link" id="btnInstaFollow">팔로우</button>
+                      </div>
+                      <span class="insta-location" id="instaLocation">대한민국 서울 • 건강 정보 채널</span>
+                    </div>
+                  </div>
+                  <div class="insta-header-right-btns">
+                    <button class="insta-more-btn" id="btnEditCurrentPost" title="게시물 직접 수정 / 사진 첨부"><i class="fa-solid fa-ellipsis"></i></button>
+                  </div>
+                </div>
+
+                <!-- 피드 미디어 영역 (고해상도 카드뉴스 / 실사 이미지 / 더블탭 하트 지원) -->
+                <div class="insta-media-container" id="instaMediaContainer">
+                  <img src="" alt="인스타그램 포스트 이미지" class="insta-post-image" id="instaPostImage">
+                  
+                  <!-- 더블탭 하트 애니메이션 이펙트 -->
+                  <div class="double-tap-heart" id="instaDoubleTapHeart">
+                    <i class="fa-solid fa-heart"></i>
+                  </div>
+
+                  <!-- 카드뉴스 슬라이드 인디케이터 (1/4) -->
+                  <div class="insta-carousel-badge" id="instaCarouselBadge">1/4</div>
+
+                  <!-- 오디오 인디케이터 배너 -->
+                  <div class="insta-audio-badge"><i class="fa-solid fa-music"></i> 오리지널 사운드 • 메디컬 팩트</div>
+
+                  <!-- 빠른 사진 교체 버튼 -->
+                  <button class="insta-change-photo-btn" id="btnQuickPhotoChange" title="내 컴퓨터의 인스타 캡처본/사진으로 변경">
+                    <i class="fa-solid fa-camera"></i> 사진 변경
+                  </button>
+
+                  <!-- 한국형 인스타그램 카드뉴스 텍스트 오버레이 헤드라인 -->
+                  <div class="insta-media-overlay-headline">
+                    <span class="media-tag-pill" id="mediaTagPill">🚨 긴급 팩트체크</span>
+                    <div class="media-headline-title" id="mediaHeadlineTitle">🍋 의사들이 절대 안 알려주는 레몬물 항암 기적!</div>
+                    <div class="media-headline-sub" id="mediaHeadlineSub">공복에 레몬즙 한 컵 = 암세포 99% 박멸?!</div>
+                  </div>
+
+                  <!-- 인스타그램 슬라이드 페이지네이션 도트 -->
+                  <div class="insta-carousel-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                  </div>
+                </div>
+
+                <!-- 피드 인터랙션 액션 버튼 바 -->
+                <div class="insta-actions-row">
+                  <div class="left-actions">
+                    <button class="action-btn-heart" id="instaLikeBtn" aria-label="좋아요" title="좋아요 누르기"><i class="fa-regular fa-heart"></i></button>
+                    <button class="action-btn-bubble" id="instaCommentBtn" aria-label="댓글 달기" title="댓글 입력창으로 이동"><i class="fa-regular fa-comment"></i></button>
+                    <button class="action-btn-plane" id="instaShareBtn" aria-label="게시물 공유" title="게시물 링크 복사"><i class="fa-regular fa-paper-plane"></i></button>
+                  </div>
+                  <button class="action-btn-bookmark" id="instaSaveBtn" aria-label="저장" title="게시물 저장"><i class="fa-regular fa-bookmark"></i></button>
+                </div>
+
+                <!-- 좋아요 수 & 본문 캡션 -->
+                <div class="insta-post-body">
+                  <div class="insta-likes-count">
+                    좋아요 <strong id="instaLikesCount">12,492</strong>개
+                  </div>
+                  <div class="insta-caption-text">
+                    <strong class="caption-user" id="instaCaptionUser">miracle_detox_life</strong>
+                    <span id="instaCaptionBody"></span>
+                    <button class="btn-caption-more" id="btnToggleCaption">... 더 보기</button>
+                  </div>
+                  <div class="insta-translate-link">번역 보기</div>
+                  <div class="insta-post-date" id="instaPostDate">3일 전</div>
+
+                  <!-- 피드 내 댓글 목록 프리뷰 (공인 전문의 팩트체크 및 시민 의견) -->
+                  <div class="insta-feed-comments-preview" id="instaFeedCommentsPreview">
+                    <!-- JS에서 동적 렌더링 -->
+                  </div>
+
+                  <!-- 아이폰 화면 내 실시간 댓글 작성 바 -->
+                  <div class="insta-phone-comment-input-row">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=60&q=80" class="commenter-avatar-sm" alt="내 프로필">
+                    <input type="text" id="phoneCommentInput" placeholder="댓글 달기..." class="phone-comment-input">
+                    <button id="btnPhoneCommentSubmit" class="btn-phone-post">게시</button>
+                  </div>
+                </div>
+              </article>
+
+              <!-- 인스타그램 하단 네비게이션 탭 -->
+              <nav class="insta-bottom-nav">
+                <i class="fa-solid fa-house active"></i>
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <i class="fa-regular fa-square-plus"></i>
+                <i class="fa-solid fa-clapperboard"></i>
+                <div class="insta-profile-avatar-thumb"></div>
+              </nav>
+
+            </div>
+
+            <!-- ==============================================
+                 [VIEW 2: SECONDARY] 메타 공식 웹 임베드 컨테이너 (Iframe)
+                 ============================================== -->
+            <div class="insta-live-wrapper" id="instaEmbedView" style="display: none;">
+              <div class="embed-helper-banner">
+                <div class="embed-helper-text">
+                  <i class="fa-solid fa-circle-info"></i>
+                  <span>Meta(인스타그램) 공식 임베드를 통해 실제 웹 화면을 렌더링합니다.</span>
+                </div>
+                <button class="btn-switch-mobile-now" id="btnSwitchBackMobile">
+                  <i class="fa-solid fa-mobile-screen"></i>
+                  <span>모바일 앱 뷰로 보기</span>
+                </button>
+              </div>
+              <iframe 
+                id="instaLiveIframe" 
+                class="insta-live-iframe" 
+                src="" 
+                title="인스타그램 실제 게시물 화면"
+                allowfullscreen 
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                scrolling="yes"
+              ></iframe>
+            </div>
+
+            <!-- ★★★ 아이폰 화면 위 항상 상주하는 플로팅 MEDI-CHECK 실시간 가드 배너 ★★★ -->
+            <div class="insta-live-floating-badge" id="instaLiveFloatingBadge">
+              <div class="live-badge-top-row">
+                <div class="live-badge-left">
+                  <div class="live-badge-icon" id="liveBadgeIcon">
+                    <i class="fa-solid fa-shield-xmark"></i>
+                  </div>
+                  <div>
+                    <div class="live-badge-meta">
+                      <span class="live-badge-brand">MEDI-CHECK 검증</span>
+                      <span class="live-score-pill" id="liveScorePill">12점</span>
+                    </div>
+                    <div class="live-label-name" id="liveLabelName">잘못된 정보 확인</div>
+                  </div>
+                </div>
+                <div class="live-badge-actions">
+                  <button class="btn-live-focus" id="btnLiveFocusReport" title="왼쪽 상세 사유 카드 보기">
+                    <span>이유 보기</span>
+                    <i class="fa-solid fa-arrow-left"></i>
+                  </button>
+                  <button class="btn-badge-toggle" id="btnToggleBadgeCollapse" title="배너 접기/펼치기">
+                    <i class="fa-solid fa-chevron-down"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="live-reason-box" id="liveReasonBox">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span id="liveReasonText">체내 산도 조절 불가 및 표준 항암치료 방해로 치명적 위험</span>
+              </div>
+            </div>
+
+            <!-- 아이폰 홈 인디케이터 바 -->
+            <div class="ios-home-indicator"></div>
+
+          </div>
+        </div>
+
+        <!-- NEW: 아이폰 화면 아래 댓글 영역 -->
+        <div class="iphone-bottom-comments" style="width: 100%; max-width: 440px; margin-top: 16px; background: #1c2128; border-radius: 12px; padding: 16px; border: 1px solid rgba(255,255,255,0.1);">
+          <h4 style="font-size: 13px; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-comments"></i> 사용자 집단지성 제보 (신뢰도 교차검증)
+          </h4>
+          <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+            <input type="text" id="userFeedbackInput" placeholder="이 URL에 대한 추가 근거나 제보를 남겨주세요..." style="flex: 1; padding: 8px 12px; border-radius: 6px; border: 1px solid #30363d; background: #0d1117; color: #fff; font-size: 12px; outline: none;">
+            <button id="btnSubmitFeedback" style="background: #3b82f6; color: #fff; border: none; padding: 0 14px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;">등록</button>
+          </div>
+          <div id="userFeedbackList" style="display: flex; flex-direction: column; gap: 8px; max-height: 150px; overflow-y: auto;">
+            <div style="font-size: 11px; color: #8b949e; text-align: center; padding: 10px 0;">아직 등록된 제보가 없습니다.</div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- ==============================================
+       [MODAL 1] 설정 (Settings) 모달 창
+       ============================================== -->
+  <div class="modal-backdrop" id="settingsModal" aria-hidden="true" role="dialog">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-gear modal-icon"></i>
+          <div>
+            <h3 class="modal-title">MEDI-CHECK 의료정보 검증 기준 설정</h3>
+            <p class="modal-subtitle">4단계 신뢰도 라벨 및 5단계 파이프라인의 판단 기준을 검증조건으로 설정합니다.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseSettings" aria-label="설정창 닫기"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="settings-tabs">
+          <button class="settings-tab-btn active" data-settings-tab="labels">4단계 인증 라벨 기준 관리</button>
+          <button class="settings-tab-btn" data-settings-tab="pipeline">5단계 파이프라인 프로세스</button>
+        </div>
+
+        <div class="settings-panel active" id="settingsPanelLabels">
+          <p class="settings-guide-note">
+            <i class="fa-solid fa-circle-info"></i> 각 라벨의 명칭, 요약 설명 및 세부 판별 체크포인트(검증조건)를 수정하거나 추가할 수 있습니다.
+          </p>
+          <div class="labels-editor-container" id="labelsEditorContainer" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+            <!-- 단계 1 설정 -->
+            <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 12px;">
+              <h4 style="color: #4ade80; margin-bottom: 8px; font-size: 14px;"><i class="fa-solid fa-circle-check"></i> 1단계: 검증 완료 (Verified)</h4>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <input type="text" value="과학적 근거가 충분하고 공인 전문의 검토를 통과한 정보" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 12px;">
+                <textarea rows="2" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 12px;">검증조건 1: WHO, 질병관리청 지침과 일치할 것&#10;검증조건 2: 무작위 대조 임상시험 논문 존재</textarea>
+              </div>
+            </div>
+            
+            <!-- 단계 2 설정 -->
+            <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 12px;">
+              <h4 style="color: #fbbf24; margin-bottom: 8px; font-size: 14px;"><i class="fa-solid fa-triangle-exclamation"></i> 2단계: 추가 확인 필요 (Caution)</h4>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <input type="text" value="근거가 부족하거나 대규모 인체 임상이 완료되지 않은 정보" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 12px;">
+                <textarea rows="2" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 12px;">검증조건 1: 세포 또는 동물 실험 수준의 연구&#10;검증조건 2: 의학적 가설을 단정적으로 과장 표현함</textarea>
+              </div>
+            </div>
+
+            <!-- 단계 3 설정 -->
+            <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 12px;">
+              <h4 style="color: #f87171; margin-bottom: 8px; font-size: 14px;"><i class="fa-solid fa-circle-xmark"></i> 3단계: 잘못된 정보 (Misleading)</h4>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <input type="text" value="신뢰할 만한 근거와 배치되며 환자에게 위험을 초래하는 정보" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 12px;">
+                <textarea rows="2" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 12px;">검증조건 1: 정규 치료 거부 조장 및 허위 민간요법&#10;검증조건 2: 공포심을 자극하여 상업적 판매 유도</textarea>
+              </div>
+            </div>
+            
+            <button id="btnAddCondition" style="margin-top: 5px; padding: 10px; border-radius: 6px; border: 1px dashed #30363d; background: transparent; color: #58a6ff; cursor: pointer; font-size: 12px; transition: 0.2s;">
+              <i class="fa-solid fa-plus"></i> 새 검증조건 추가하기
+            </button>
+          </div>
+        </div>
+
+        <div class="settings-panel" id="settingsPanelPipeline">
+          <p class="settings-guide-note">
+            <i class="fa-solid fa-circle-info"></i> 파이프라인 각 단계의 명칭과 수행 작업을 변경할 수 있습니다.
+          </p>
+          <div class="pipeline-editor-container" id="pipelineEditorContainer" style="display: flex; flex-direction: column; gap: 15px; margin-top: 15px;">
+            <!-- 단계 1 -->
+            <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 12px;">
+              <h4 style="color: #c9d1d9; margin-bottom: 8px; font-size: 14px;"><span style="background: #21262d; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 6px; color: #fff;">1단계</span>게시물 등록 및 탐지</h4>
+              <input type="text" value="건강·의료 관련 SNS 게시물 분류 및 메타데이터 파싱" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 12px;">
+            </div>
+            <!-- 단계 2 -->
+            <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 12px;">
+              <h4 style="color: #c9d1d9; margin-bottom: 8px; font-size: 14px;"><span style="background: #21262d; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 6px; color: #fff;">2단계</span>AI 사전 분석</h4>
+              <input type="text" value="주요 주장 추출 및 의학적 근거(PubMed/질병청) 대조" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 12px;">
+            </div>
+            <!-- 단계 3 -->
+            <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 12px;">
+              <h4 style="color: #c9d1d9; margin-bottom: 8px; font-size: 14px;"><span style="background: #21262d; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 6px; color: #fff;">3단계</span>전문가 검증</h4>
+              <input type="text" value="의료 전문가가 근거와 판단 결과 검토 및 위험도 평가" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 12px;">
+            </div>
+            <!-- 단계 4 -->
+            <div style="background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 12px;">
+              <h4 style="color: #c9d1d9; margin-bottom: 8px; font-size: 14px;"><span style="background: #21262d; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-right: 6px; color: #fff;">4단계</span>MEDI-CHECK 라벨 부착</h4>
+              <input type="text" value="검증 결과와 근거 자료를 SNS에 표시 (4단계 등급 부여)" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 12px;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" id="btnResetSettings">
+          <i class="fa-solid fa-rotate-left"></i> 기본값으로 복원
+        </button>
+        <button class="btn-primary" id="btnSaveSettings">
+          <i class="fa-solid fa-floppy-disk"></i> 설정 저장 및 적용
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==============================================
+       [MODAL 2] 4단계 신뢰도 구분 기준 안내 가이드 모달
+       ============================================== -->
+  <div class="modal-backdrop" id="guideModal" aria-hidden="true" role="dialog">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <div class="modal-title-box">
+          <i class="fa-solid fa-book-medical modal-icon"></i>
+          <div>
+            <h3 class="modal-title">믿을 만한 의료정보 구별 가이드 (4단계 판별법)</h3>
+            <p class="modal-subtitle">의학적 근거 중심 의학(Evidence-Based Medicine)에 기반한 4단계 신뢰도 평가 체계</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="btnCloseGuide" aria-label="가이드창 닫기"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="modal-body guide-body">
+        <div class="guide-intro-banner">
+          <h4><i class="fa-solid fa-stethoscope"></i> 왜 SNS 의료정보의 4단계 검증이 필요할까요?</h4>
+          <p>
+            인스타그램 등 SNS 알고리즘은 '자극적이고 단정적인' 콘텐츠를 우대하여, 검증되지 않은 민간요법이나 공포 마케팅이 빠르게 확산됩니다. 
+            MEDI-CHECK는 <strong>세계보건기구(WHO), 질병관리청(KDCA), 대한의학회</strong>의 EBM 검증 표준을 적용해 정보를 4단계로 엄격히 구분합니다.
+          </p>
+        </div>
+
+        <div class="guide-tier-grid">
+          <div class="guide-tier-card verified">
+            <div class="tier-card-top">
+              <span class="tier-badge-pill green"><i class="fa-solid fa-circle-check"></i> 1단계</span>
+              <h4 class="tier-name">검증 완료 (Verified)</h4>
+            </div>
+            <p class="tier-summary">과학적 근거가 충분하고 주요 내용이 공인 전문의 검토를 통과한 정보</p>
+            <div class="tier-checklist">
+              <h5>핵심 판별 지표:</h5>
+              <ul>
+                <li><i class="fa-solid fa-check"></i> WHO, 질병관리청, 대한의학회 공인 지침과 완전 일치</li>
+                <li><i class="fa-solid fa-check"></i> 무작위 대조 임상시험(RCT) 또는 체계적 문헌고찰 논문 존재</li>
+                <li><i class="fa-solid fa-check"></i> 인과관계와 안전한 섭취/치료 용량이 과학적으로 입증됨</li>
+                <li><i class="fa-solid fa-check"></i> 특정 제품 판매나 상업적 독점 링크가 없는 객관적 정보</li>
+              </ul>
+            </div>
+            <div class="tier-user-action">
+              <strong>권장 행동:</strong> 안심하고 건강 관리에 활용 가능
+            </div>
+          </div>
+
+          <div class="guide-tier-card caution">
+            <div class="tier-card-top">
+              <span class="tier-badge-pill amber"><i class="fa-solid fa-triangle-exclamation"></i> 2단계</span>
+              <h4 class="tier-name">추가 확인 필요 (Caution)</h4>
+            </div>
+            <p class="tier-summary">근거가 부족하거나 아직 의학적으로 대규모 인체 임상이 완료되지 않은 정보</p>
+            <div class="tier-checklist">
+              <h5>핵심 판별 지표:</h5>
+              <ul>
+                <li><i class="fa-solid fa-check"></i> 세포(In vitro) 또는 동물 실험 수준에 머물러 있는 연구</li>
+                <li><i class="fa-solid fa-check"></i> 기저질환(고혈압, 신장병, 당뇨 등)에 따라 부작용 위험 존재</li>
+                <li><i class="fa-solid fa-check"></i> 의학적 가설을 '확정된 사실'처럼 단정적으로 과장 표현</li>
+                <li><i class="fa-solid fa-check"></i> 보조적 건강기능식품을 질환 치료제처럼 호도할 위험</li>
+              </ul>
+            </div>
+            <div class="tier-user-action">
+              <strong>권장 행동:</strong> 맹신을 피하고 주치의·약사와 상담 후 적용
+            </div>
+          </div>
+
+          <div class="guide-tier-card misleading">
+            <div class="tier-card-top">
+              <span class="tier-badge-pill red"><i class="fa-solid fa-circle-xmark"></i> 3단계</span>
+              <h4 class="tier-name">잘못된 정보 확인 (Misleading)</h4>
+            </div>
+            <p class="tier-summary">신뢰할 만한 의학적 근거와 명확하게 배치되며 환자에게 위험을 초래하는 정보</p>
+            <div class="tier-checklist">
+              <h5>핵심 판별 지표:</h5>
+              <ul>
+                <li><i class="fa-solid fa-check"></i> "암 100% 완치", "혈압약 끊기" 등 정규 치료 거부 조장</li>
+                <li><i class="fa-solid fa-check"></i> 이미 과학적으로 인과관계가 반증된 허위 민간요법</li>
+                <li><i class="fa-solid fa-check"></i> 치료 골든타임을 상실시키거나 간/신장 독성 유발</li>
+                <li><i class="fa-solid fa-check"></i> 공포심을 자극해 고가의 사기성 건강식품 판매 유도</li>
+              </ul>
+            </div>
+            <div class="tier-user-action danger">
+              <strong>권장 행동:</strong> 즉시 실천 중단 및 허위정보 신고
+            </div>
+          </div>
+
+          <div class="guide-tier-card unverified">
+            <div class="tier-card-top">
+              <span class="tier-badge-pill gray"><i class="fa-solid fa-circle-question"></i> 4단계</span>
+              <h4 class="tier-name">미검증 (Unverified)</h4>
+            </div>
+            <p class="tier-summary">아직 검증 절차가 이루어지지 않은 정보 (잘못된 정보라는 확정은 아님)</p>
+            <div class="tier-checklist">
+              <h5>핵심 판별 지표:</h5>
+              <ul>
+                <li><i class="fa-solid fa-check"></i> 최근 새로 등록되어 AI 및 의사 검증 큐에 대기 중</li>
+                <li><i class="fa-solid 검증"></i> 출처 문헌이나 구체적 성분 데이터가 누락되어 검토 대기</li>
+                <li><i class="fa-solid fa-check"></i> 식약처 미등록 신원료 또는 해외 미승인 원료 포함</li>
+              </ul>
+            </div>
+            <div class="tier-user-action">
+              <strong>권장 행동:</strong> 검증 완료 전까지 섣부른 신뢰 유보
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary" id="btnConfirmGuide">확인 완료</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 토스트 알림 메시지 레이어 -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- 스크립트 로드: 데이터셋 및 앱 컨트롤러 -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
