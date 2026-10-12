@@ -950,6 +950,19 @@ body {
 .theme-unverified .label-status-name { color: #d1d5db; }
 .theme-unverified .verdict-risk-badge { background: rgba(107, 114, 128, 0.15); color: #9ca3af; border-color: rgba(107, 114, 128, 0.35); }
 
+/* 실시간 플로팅 가드 배너 테마 연동 */
+.insta-live-floating-badge.theme-verified { border-color: #10b981; }
+.insta-live-floating-badge.theme-verified .live-badge-icon { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.insta-live-floating-badge.theme-verified .live-score-pill { background: rgba(16, 185, 129, 0.25); color: #6ee7b7; }
+.insta-live-floating-badge.theme-verified .live-label-name { color: #34d399; }
+.insta-live-floating-badge.theme-verified .live-reason-box i { color: #10b981; }
+
+.insta-live-floating-badge.theme-caution { border-color: #f59e0b; }
+.insta-live-floating-badge.theme-caution .live-badge-icon { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+.insta-live-floating-badge.theme-caution .live-score-pill { background: rgba(245, 158, 11, 0.25); color: #fde68a; }
+.insta-live-floating-badge.theme-caution .live-label-name { color: #fbbf24; }
+.insta-live-floating-badge.theme-caution .live-reason-box i { color: #f59e0b; }
+
 /* ==========================================================================
    5단계 파이프라인 (첨부 1, 2 정밀 재현)
    ========================================================================== */
